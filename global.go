@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/Sean-Der/fail2go"
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/Sean-Der/fail2go"
+	"github.com/go-chi/chi"
 )
 
 func globalStatusHandler(res http.ResponseWriter, req *http.Request, fail2goConn *fail2go.Conn) {
@@ -40,15 +41,16 @@ func globalBansHandler(res http.ResponseWriter, req *http.Request, fail2goConn *
 	res.Write(encodedOutput)
 }
 
-func globalHandler(globalRouter *mux.Router, fail2goConn *fail2go.Conn) {
-	globalRouter.HandleFunc("/status", func(res http.ResponseWriter, req *http.Request) {
-		globalStatusHandler(res, req, fail2goConn)
-	}).Methods("GET")
-	globalRouter.HandleFunc("/ping", func(res http.ResponseWriter, req *http.Request) {
-		globalPingHandler(res, req, fail2goConn)
-	}).Methods("GET")
-	globalRouter.HandleFunc("/bans", func(res http.ResponseWriter, req *http.Request) {
-		globalBansHandler(res, req, fail2goConn)
-	}).Methods("GET")
-
+func globalHandler(r *chi.Mux, fail2goConn *fail2go.Conn) {
+	r.Route("/global", func(r chi.Router) {
+		r.Get("/status", func(w http.ResponseWriter, r *http.Request) {
+			globalStatusHandler(w, r, fail2goConn)
+		})
+		r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+			globalPingHandler(w, r, fail2goConn)
+		})
+		r.Get("/bans", func(w http.ResponseWriter, r *http.Request) {
+			globalBansHandler(w, r, fail2goConn)
+		})
+	})
 }
