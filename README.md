@@ -3,14 +3,8 @@
 ## Overview
 fail2rest is a small REST server that aims to allow full administration of a fail2ban server via HTTP
 
-fail2rest will eventually be used as a backend to a small web app to make fail2ban
-administration and reporting easier.
-
 ## Requirements
-fail2rest is written in Golang, so it requires a working Golang installation. If you have never used Golang before install it from your
-package manager, and then follow [these](http://golang.org/doc/code.html) instructions to setup your enviroment.
-
-Some libraries currently are not building on older versions of Go, I recommend running the newest stable of Golang.
+fail2rest is written in Golang, so it requires a working Golang installation. If you have never used Golang before install it from the website.
 
 ## Installing
 Once you have a working Golang installation all you need to do is run

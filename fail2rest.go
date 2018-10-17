@@ -3,8 +3,6 @@ package main
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,34 +11,17 @@ import (
 	"github.com/Sean-Der/fail2go"
 	"github.com/go-chi/chi"
 )
-
-type Configuration struct {
-	Addr           string
-	Fail2banSocket string
-}
-
 var fail2goConn *fail2go.Conn
 
 func main() {
-	configPath := flag.String("config", "config.json", "path to config.json")
-	flag.Parse()
-
-	file, fileErr := os.Open(*configPath)
-
-	if fileErr != nil {
-		fmt.Println("failed to open config:", fileErr)
+	port, ok := os.LookupEnv("PORT")
+	fail2ban, ok1 := os.LookupEnv("FAIL2BAN_SOCKET")
+	if !ok || !ok1 {
+		fmt.Println("must provide PORT and FAIL2BAN_SOCKET")
 		os.Exit(1)
 	}
 
-	configuration := new(Configuration)
-	configErr := json.NewDecoder(file).Decode(configuration)
-
-	if configErr != nil {
-		fmt.Println("config error:", configErr)
-		os.Exit(1)
-	}
-
-	fail2goConn := fail2go.Newfail2goConn(configuration.Fail2banSocket)
+	fail2goConn := fail2go.Newfail2goConn(fail2ban)
 	r := chi.NewRouter()
 
 	globalHandler(r, fail2goConn)
@@ -50,19 +31,17 @@ func main() {
 		whoisHandler(res, req, fail2goConn)
 	})
 
-	http.Handle("/", r)
-	cfg := loadTLSConfig()
 	server := &http.Server{
-		Addr:         configuration.Addr,
+		Addr:         port,
 		Handler:      r,
-		TLSConfig:    cfg,
+		TLSConfig:    loadTLSConfig(),
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
 	}
-	fmt.Println(server.ListenAndServeTLS("cert.crt", "key.key")) //Should be read from config
+	fmt.Println(server.ListenAndServeTLS("server-cert.pem", "server-key.pem")) //Should be read from config
 }
 
 func loadTLSConfig() *tls.Config {
-	userCert, err := ioutil.ReadFile("client.crt")
+	userCert, err := ioutil.ReadFile("ca.pem")
 	if err != nil {
 		fmt.Println("couldn't find client certificate", err)
 		os.Exit(1)
