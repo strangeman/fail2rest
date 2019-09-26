@@ -21,6 +21,11 @@ func (a *API) Register(r chi.Router) {
 		r.Get("/ping", a.getGlobalPing)
 		r.Get("/bans", a.getGlobalBans)
 	})
+	r.Route("/jail", func(r chi.Router) {
+		r.Route("/{jail}", func(r chi.Router) {
+			r.Get("/", a.getJail)
+		})
+	})
 }
 
 func (*API) loggingHandler(next http.Handler) http.Handler {
@@ -31,4 +36,8 @@ func (*API) loggingHandler(next http.Handler) http.Handler {
 		}).Info("Request received")
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (*API) handleError(w http.ResponseWriter, r *http.Request, err error) {
+	w.WriteHeader(http.StatusInternalServerError)
 }
