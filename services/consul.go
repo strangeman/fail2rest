@@ -1,28 +1,29 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/consul/api"
 	"github.com/Strum355/log"
+	"github.com/hashicorp/consul/api"
 )
 
 type ConsulService struct {
-	ID string
-	ConsulHost string
+	ID          string
+	ConsulHost  string
 	ConsulToken string
 	ServiceAddr string
-	Port int
-	TTL time.Duration
-	Secret string
-	client *api.Client
+	Port        int
+	TTL         time.Duration
+	Secret      string
+	client      *api.Client
 }
 
 func (c *ConsulService) Setup() error {
 	config := api.Config{
 		Address: c.ConsulHost,
-		Token: c.ConsulToken,
+		Token:   c.ConsulToken,
 	}
 	client, err := api.NewClient(&config)
 	if err != nil {
@@ -37,14 +38,19 @@ func (c *ConsulService) Register() error {
 	c.ID = fmt.Sprintf("fail2rest@%s", c.ServiceAddr)
 
 	service := &api.AgentServiceRegistration{
-		ID: c.ID,
-		Name: "fail2rest",
+		ID:      c.ID,
+		Name:    "fail2rest",
 		Address: c.ServiceAddr,
-		Port: c.Port,
+		Port:    c.Port,
 		Check: &api.AgentServiceCheck{
 			DeregisterCriticalServiceAfter: (time.Second * 10).String(),
 			TTL:                            c.TTL.String(),
 		},
+	}
+
+	err := c.getSharedSecret()
+	if err != nil {
+		return err
 	}
 
 	registered := c.client.Agent().ServiceRegister(service)
@@ -68,4 +74,36 @@ func (c *ConsulService) updateTTL() {
 			}
 		}
 	}()
+}
+
+func (c *ConsulService) getSharedSecret() error {
+	fn := func() error {
+		path := "fail2rest-token"
+		kv, _, err := c.client.KV().Get(path, &api.QueryOptions{})
+		if err != nil {
+			return err
+		}
+
+		if kv == nil {
+			return errors.New(fmt.Sprintf("key %s not set", path))
+		}
+
+		c.Secret = string(kv.Value)
+		return nil
+	}
+
+	count := 4
+	var err error
+	for ; count > 0; count-- {
+		err = fn()
+		if err == nil {
+			return nil
+		}
+		log.WithFields(log.Fields{
+			"limit": 4,
+			"count": count,
+		}).WithError(err).Error("failed to get shared secret")
+		time.Sleep(time.Second * 3)
+	}
+	return err
 }

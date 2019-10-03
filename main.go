@@ -43,7 +43,6 @@ func main() {
 		ServiceAddr: "127.0.0.1",
 		Port:        8080,
 		TTL:         time.Second * 5,
-		Secret:      "abcd",
 	}
 	err := consul.Setup()
 	if err != nil {
