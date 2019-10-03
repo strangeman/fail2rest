@@ -71,3 +71,79 @@ func (a *API) getJail(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(output)
 }
+
+func (a *API) jailBanIP(w http.ResponseWriter, r *http.Request) {
+	input := struct {
+		IP string `json:"ip"`
+	}{}
+	json.NewDecoder(r.Body).Decode(&input)
+
+	output, err := a.Fail2Conn.JailBanIP(chi.URLParam(r, "jail"), input.IP)
+	if err != nil {
+		log.WithError(err).Error("Error banning IP")
+		a.handleError(w, r, err)
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"ip": input.IP,
+	}).Info("IP banned")
+	json.NewEncoder(w).Encode(output)
+}
+
+func (a *API) jailUnbanIP(w http.ResponseWriter, r *http.Request) {
+	input := struct {
+		IP string `json:"ip"`
+	}{}
+	json.NewDecoder(r.Body).Decode(&input)
+
+	output, err := a.Fail2Conn.JailUnbanIP(chi.URLParam(r, "jail"), input.IP)
+	if err != nil {
+		log.WithError(err).Error("Error unbanning IP")
+		a.handleError(w, r, err)
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"ip": input.IP,
+	}).Info("IP unbanned")
+	json.NewEncoder(w).Encode(output)
+}
+
+func (a *API) jailAddFailRegex(w http.ResponseWriter, r *http.Request) {
+	input := struct {
+		FailRegex string `json:"fail_regex"`
+	}{}
+	json.NewDecoder(r.Body).Decode(&input)
+
+	output, err := a.Fail2Conn.JailAddFailRegex(chi.URLParam(r, "jail"), input.FailRegex)
+	if err != nil {
+		log.WithError(err).Error("Error adding fail regex")
+		a.handleError(w, r, err)
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"regex": input.FailRegex,
+	}).Info("Fail Regex added")
+	json.NewEncoder(w).Encode(output)
+}
+
+func (a *API) jailDeleteFailRegex(w http.ResponseWriter, r *http.Request) {
+	input := struct {
+		FailRegex string `json:"fail_regex"`
+	}{}
+	json.NewDecoder(r.Body).Decode(&input)
+
+	output, err := a.Fail2Conn.JailDeleteFailRegex(chi.URLParam(r, "jail"), input.FailRegex)
+	if err != nil {
+		log.WithError(err).Error("Error removing fail regex")
+		a.handleError(w, r, err)
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"regex": input.FailRegex,
+	}).Info("Fail Regex added")
+	json.NewEncoder(w).Encode(output)
+}
