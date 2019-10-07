@@ -10,4 +10,5 @@ require (
 	github.com/hashicorp/consul/api v1.2.0
 	github.com/kisielk/og-rek v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
+	github.com/spf13/viper v1.4.0
 )

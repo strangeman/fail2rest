@@ -7,6 +7,7 @@ import (
 
 	"github.com/Strum355/log"
 	"github.com/hashicorp/consul/api"
+	"github.com/spf13/viper"
 )
 
 type ConsulService struct {
@@ -78,7 +79,7 @@ func (c *ConsulService) updateTTL() {
 
 func (c *ConsulService) getSharedSecret() error {
 	fn := func() error {
-		path := "fail2rest-token"
+		path := viper.GetString("fail2rest.token-location")
 		kv, _, err := c.client.KV().Get(path, &api.QueryOptions{})
 		if err != nil {
 			return err

@@ -4,8 +4,10 @@ import (
 	"github.com/Sean-Der/fail2go"
 	"github.com/Strum355/log"
 	"github.com/go-chi/chi"
+	"github.com/spf13/viper"
 
 	"fail2rest/api"
+	"fail2rest/config"
 	"fail2rest/services"
 
 	"fmt"
@@ -16,32 +18,34 @@ import (
 
 func main() {
 	// Initialise logger
-	log.InitSimpleLogger(&log.Config{})
+	if viper.GetBool("fail2rest.production") {
+		log.InitJSONLogger(&log.Config{})
+	} else {
+		log.InitSimpleLogger(&log.Config{})
+	}
 
-	// Gather environment variables
-	port := "8080"
-	fail2ban := "/var/run/fail2ban/fail2ban.sock"
+	config.Load()
 
 	// Initialise Fail2Ban connection
 	log.WithFields(log.Fields{
-		"fail2ban socket": fail2ban,
+		"fail2ban socket": viper.GetString("fail2rest.fail2ban"),
 	}).Info("Initialising fail2ban connection")
 
-	conn := fail2go.Newfail2goConn(fail2ban)
+	conn := fail2go.Newfail2goConn(viper.GetString("fail2rest.fail2ban"))
 
 	// Start HTTP Server
 	log.WithFields(log.Fields{
-		"port": port,
+		"port": viper.GetInt("fail2rest.port"),
 	}).Info("Initialising HTTP Server")
 
 	r := chi.NewRouter()
 
 	// Register service with Consul
 	consul := services.ConsulService{
-		ConsulHost:  "127.0.0.1:8500",
-		ConsulToken: "",
+		ConsulHost:  viper.GetString("fail2rest.consul_host"),
+		ConsulToken: viper.GetString("fail2rest.consul_token"),
 		ServiceAddr: "127.0.0.1",
-		Port:        8080,
+		Port:        viper.GetInt("fail2rest.port"),
 		TTL:         time.Second * 5,
 	}
 	err := consul.Setup()
@@ -59,7 +63,7 @@ func main() {
 	api := api.API{Fail2Conn: conn, Secret: consul.Secret}
 	api.Register(r)
 
-	err = http.ListenAndServe(":"+fmt.Sprint(port), r)
+	err = http.ListenAndServe(":"+fmt.Sprint(viper.GetInt("fail2rest.port")), r)
 	if err != nil {
 		log.WithError(err).Error("Error serving HTTP")
 	}
