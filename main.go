@@ -17,14 +17,15 @@ import (
 )
 
 func main() {
+	// Load Config
+	config.Load()
+
 	// Initialise logger
 	if viper.GetBool("fail2rest.production") {
 		log.InitJSONLogger(&log.Config{})
 	} else {
 		log.InitSimpleLogger(&log.Config{})
 	}
-
-	config.Load()
 
 	// Initialise Fail2Ban connection
 	log.WithFields(log.Fields{
