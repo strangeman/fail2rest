@@ -27,6 +27,9 @@ func main() {
 		log.InitSimpleLogger(&log.Config{})
 	}
 
+	// Print settings
+	config.PrintSettings()
+
 	// Initialise Fail2Ban connection
 	log.WithFields(log.Fields{
 		"fail2ban socket": viper.GetString("fail2rest.fail2ban"),
