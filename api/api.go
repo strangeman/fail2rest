@@ -13,15 +13,18 @@ type API struct {
 }
 
 func (a *API) Register(r chi.Router) {
-	r.Use(a.authMiddleware)
 	r.Use(a.loggingHandler)
 	r.Route("/global", func(r chi.Router) {
-		r.Get("/status", a.getGlobalStatus)
 		r.Get("/ping", a.getGlobalPing)
-		r.Get("/bans", a.getGlobalBans)
+		r.Group(func(r chi.Router) {
+			r.Use(a.authMiddleware)
+			r.Get("/status", a.getGlobalStatus)
+			r.Get("/bans", a.getGlobalBans)
+		})
 	})
 	r.Route("/jail", func(r chi.Router) {
 		r.Route("/{jail}", func(r chi.Router) {
+			r.Use(a.authMiddleware)
 			r.Get("/", a.getJail)
 			r.Post("/ban", a.jailBanIP)
 			r.Post("/failregex", a.jailAddFailRegex)
