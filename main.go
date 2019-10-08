@@ -64,7 +64,7 @@ func main() {
 	}
 
 	// Initialise API
-	api := api.API{Fail2Conn: conn, Secret: consul.Secret}
+	api := api.API{Fail2Conn: conn}
 	api.Register(r)
 
 	err = http.ListenAndServe(":"+fmt.Sprint(viper.GetInt("http.port")), r)

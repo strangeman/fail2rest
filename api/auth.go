@@ -2,6 +2,8 @@ package api
 
 import (
 	"net/http"
+
+	"github.com/spf13/viper"
 )
 
 func (a *API) authMiddleware(next http.Handler) http.Handler {
@@ -13,7 +15,7 @@ func (a *API) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if token != a.Secret {
+		if token != viper.GetString("fail2rest.secret") {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}

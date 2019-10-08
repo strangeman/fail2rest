@@ -10,7 +10,6 @@ import (
 
 type API struct {
 	Fail2Conn *fail2go.Conn
-	Secret    string
 }
 
 func (a *API) Register(r chi.Router) {

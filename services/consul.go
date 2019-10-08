@@ -17,7 +17,6 @@ type ConsulService struct {
 	ServiceAddr string
 	Port        int
 	TTL         time.Duration
-	Secret      string
 	client      *api.Client
 }
 
@@ -66,7 +65,7 @@ func (c *ConsulService) updateTTL() {
 		ticker := time.NewTicker(c.TTL / 2)
 		for range ticker.C {
 			health := api.HealthPassing
-			if c.Secret == "" {
+			if viper.GetString("fail2rest.secret") == "" {
 				health = api.HealthCritical
 			}
 			err := c.client.Agent().UpdateTTL("service:"+c.ID, "", health)
@@ -89,7 +88,7 @@ func (c *ConsulService) getSharedSecret() error {
 			return errors.New(fmt.Sprintf("key %s not set", path))
 		}
 
-		c.Secret = string(kv.Value)
+		viper.Set("fail2rest.secret", string(kv.Value))
 		return nil
 	}
 
