@@ -2,12 +2,14 @@ package config
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/Strum355/log"
 	"github.com/spf13/viper"
 )
 
 func Load() {
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	loadDefaults()
 	viper.AutomaticEnv()
 }

@@ -21,9 +21,7 @@ func (a *API) getJail(w http.ResponseWriter, r *http.Request) {
 	jail := chi.URLParam(r, "jail")
 
 	currentFailed, totalFailed, fileList, currentBanned, totalBanned, ipList, err := a.Fail2Conn.JailStatus(jail)
-	if err != nil {
-		log.WithError(err).Error("Could not get jail")
-		a.handleError(w, r, err)
+	if !errHandle(err) {
 		return
 	}
 

@@ -32,24 +32,24 @@ func main() {
 
 	// Initialise Fail2Ban connection
 	log.WithFields(log.Fields{
-		"fail2ban socket": viper.GetString("fail2rest.fail2ban"),
+		"fail2ban socket": viper.GetString("fail2ban.socket"),
 	}).Info("Initialising fail2ban connection")
 
-	conn := fail2go.Newfail2goConn(viper.GetString("fail2rest.fail2ban"))
+	conn := fail2go.Newfail2goConn(viper.GetString("fail2ban.socket"))
 
 	// Start HTTP Server
 	log.WithFields(log.Fields{
-		"port": viper.GetInt("fail2rest.port"),
+		"port": viper.GetInt("http.port"),
 	}).Info("Initialising HTTP Server")
 
 	r := chi.NewRouter()
 
 	// Register service with Consul
 	consul := services.ConsulService{
-		ConsulHost:  viper.GetString("fail2rest.consul_host"),
-		ConsulToken: viper.GetString("fail2rest.consul_token"),
+		ConsulHost:  viper.GetString("consul.host"),
+		ConsulToken: viper.GetString("consul.token"),
 		ServiceAddr: "127.0.0.1",
-		Port:        viper.GetInt("fail2rest.port"),
+		Port:        viper.GetInt("http.port"),
 		TTL:         time.Second * 5,
 	}
 	err := consul.Setup()
@@ -67,7 +67,7 @@ func main() {
 	api := api.API{Fail2Conn: conn, Secret: consul.Secret}
 	api.Register(r)
 
-	err = http.ListenAndServe(":"+fmt.Sprint(viper.GetInt("fail2rest.port")), r)
+	err = http.ListenAndServe(":"+fmt.Sprint(viper.GetInt("http.port")), r)
 	if err != nil {
 		log.WithError(err).Error("Error serving HTTP")
 	}

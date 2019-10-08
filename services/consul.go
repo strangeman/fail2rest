@@ -79,7 +79,7 @@ func (c *ConsulService) updateTTL() {
 
 func (c *ConsulService) getSharedSecret() error {
 	fn := func() error {
-		path := viper.GetString("fail2rest.token-location")
+		path := viper.GetString("consul.fail2rest")
 		kv, _, err := c.client.KV().Get(path, &api.QueryOptions{})
 		if err != nil {
 			return err
