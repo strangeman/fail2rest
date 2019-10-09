@@ -5,6 +5,19 @@ fail2rest is a small REST server that aims to allow full administration of a fai
 
 fail2rest can be run using Docker. It must mount the fail2ban socket in `/var/run/fail2ban` and the database in `/var/lib/fail2ban`.
 
+## Endpoints
+
+| Endpoint         | Method | Sample Body   | Description                   |
+| ---------------- | ------- | ------------- | ----------------------------- |
+| /global/ping     | GET | No data       | Verify fail2ban can be pinged |
+| /global/bans     | GET | No data       | List all banned IPs           |
+| /global/status   | GET | No data       | Get status of fail2ban        |
+| /jail/{jail}/      | GET | No data       | Get all data about a jail       |
+| /jail/{jail}/ban   | POST | `{"ip": "127.0.0.1"}` | Ban an IP in the jail   |
+| /jail/{jail}/unban | POST | `{"ip": "127.0.0.1"}` | Unban an IP in the jail |
+| /jail/{jail}/failregex | POST | `{"fail_regex": "sample regex"}` | Add a fail regex to the jail |
+| /jail/{jail}/failregex | DELETE | `{"fail_regex": "sample regex"}` | Remove a fail regex from the jail |
+
 ## License
 The MIT License (MIT)
 
