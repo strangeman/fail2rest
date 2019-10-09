@@ -27,6 +27,7 @@ func (a *API) Register(r chi.Router) {
 			r.Use(a.authMiddleware)
 			r.Get("/", a.getJail)
 			r.Post("/ban", a.jailBanIP)
+			r.Post("/unban", a.jailUnbanIP)
 			r.Post("/failregex", a.jailAddFailRegex)
 			r.Delete("/failregex", a.jailDeleteFailRegex)
 		})
