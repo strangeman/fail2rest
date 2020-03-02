@@ -53,11 +53,13 @@ func (c *ConsulService) Register() error {
 		return err
 	}
 
-	registered := c.client.Agent().ServiceRegister(service)
+	if err = c.client.Agent().ServiceRegister(service); err != nil {
+		return err
+	}
 
 	c.updateTTL()
 
-	return registered
+	return nil
 }
 
 func (c *ConsulService) updateTTL() {

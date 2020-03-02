@@ -16,7 +16,7 @@ func loadDefaults() {
 	viper.SetDefault("fail2ban.socket", "/var/run/fail2ban/fail2ban.sock")
 
 	// Consul
-	viper.SetDefault("consul.host", "127.0.0.1:8500")
+	viper.SetDefault("consul.host", "netsoc-consul:8500")
 	viper.SetDefault("consul.token", "")
 	viper.SetDefault("consul.fail2rest", "fail2rest-token")
 }

@@ -1,4 +1,4 @@
-module fail2rest
+module github.com/UCCNetsoc/fail2rest
 
 go 1.13
 

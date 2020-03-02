@@ -6,9 +6,9 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/spf13/viper"
 
-	"fail2rest/api"
-	"fail2rest/config"
-	"fail2rest/services"
+	"github.com/UCCNetsoc/fail2rest/api"
+	"github.com/UCCNetsoc/fail2rest/config"
+	"github.com/UCCNetsoc/fail2rest/services"
 
 	"fmt"
 	"net/http"
