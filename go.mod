@@ -10,5 +10,5 @@ require (
 	github.com/kisielk/og-rek v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/spf13/viper v1.4.0
-	github.com/strangeman/fail2go v0.0.0-20201022133328-4364331126f3
+	github.com/strangeman/fail2go v0.0.0-20201023130352-f514a934b90e
 )
