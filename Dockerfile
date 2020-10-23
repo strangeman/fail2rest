@@ -16,13 +16,13 @@ RUN go mod download
 
 COPY . . 
 
-RUN go build -ldflags="-w -s" -o /go/bin/fail2rest
+RUN go build -a -ldflags '-linkmode external -extldflags "-static"' -o /go/bin/fail2rest
 
 RUN go mod vendor
 
 CMD [ "go", "run", "main.go" ]
 
-FROM golang:1.13
+FROM scratch
 
 COPY --from=dev /go/bin/fail2rest /fail2rest
 
