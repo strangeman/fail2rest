@@ -54,7 +54,7 @@ func main() {
 			Port:        viper.GetInt("http.port"),
 			TTL:         time.Second * 5,
 		}
-		err := consul.Setup()
+		err = consul.Setup()
 		if err != nil {
 			log.WithError(err).Error("Could not setup Consul service")
 			os.Exit(1)
